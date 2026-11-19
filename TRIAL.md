@@ -140,9 +140,10 @@ is the only slash format accepted, so `01/04/2024` means 1 April. Use
 - **Some pages are public by design.** `/` (profile page), `/gallery`
   (your collection) and `/receive/{uid}` (recipients confirm arrival
   without logging in; this writes the arrival date and their message).
-  **`/gallery` publishes each card's map marker using the contact's
-  decrypted, geocoded coordinates**, which are effectively recipients'
-  street addresses. Review that before making it public.
+  Upstream's `/gallery` map published senders' exact geocoded addresses.
+  This branch rounds public markers to one decimal (~11 km), and the
+  arrival page shows only a rounded origin and a distance rounded to
+  10 km. Exact values stay on logged-in pages.
 - **Production settings:** `APP_ENV=production`, `APP_DEBUG=false`,
   HTTPS, `php artisan config:cache`.
 - **Backups:** the database, `storage/app/public` (uploaded photos and
