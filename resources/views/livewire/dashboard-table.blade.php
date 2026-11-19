@@ -112,7 +112,7 @@
                         <th>Origin Cost</th>
                         <th>Rate</th>
                     @endif
-                    <th>Total (IDR)</th>
+                    <th>Total ({{ \App\Support\Money::base() }})</th>
                     <th>Actions</th>
                     <th style="width: 80px;"></th> 
                 </tr>
@@ -148,7 +148,7 @@
                             <span class="badge">{{ $this->getDuration($row->tanggal_kirim, $row->tanggal_terima) }}</span>
                         </td>
                         <td>
-                            {{ number_format($row->jarak_hitung) }} km
+                            {{ \App\Support\Money::number($row->jarak_hitung) }} km
                         </td>
                         <td style="max-width: 250px; word-wrap: break-word;" title="{{ $row->deskripsi_gambar }}">
                             {{ $row->deskripsi_gambar }}
@@ -162,12 +162,16 @@
                             <td>{{ $row->contact?->nomor_telepon ?: '-' }}</td>
                         @else
                             <td>
-                                {{ $row->mata_uang }} {{ number_format($row->nilai_asal, 2) }}
+                                {{ $row->mata_uang }} {{ \App\Support\Money::amount($row->nilai_asal, $row->mata_uang) }}
                             </td>
-                            <td>{{ number_format($row->kurs_idr) }}</td>
+                            <td>{{ \App\Support\Money::rate($row->exchange_rate) }}</td>
                         @endif
                         <td class="font-bold font-mono">
-                            {{ number_format($row->biaya_prangko) }}
+                            @if(($row->base_currency ?: \App\Support\Money::base()) === \App\Support\Money::base())
+                                {{ \App\Support\Money::amount($row->biaya_prangko) }}
+                            @else
+                                {{ \App\Support\Money::format($row->biaya_prangko, $row->base_currency) }}
+                            @endif
                         </td>
                         <td class="text-center">
                             <div class="flex items-center justify-center gap-2">
@@ -191,7 +195,12 @@
                 <!-- Totals Row -->
                 <tr class="total-row">
                     <td colspan="{{ $type === 'sent' ? '10' : '11' }}" style="text-align: right; padding-right: 15px;">TOTAL:</td>
-                    <td colspan="2" style="color: #d63031;">IDR {{ number_format($totalCost) }}</td>
+                    <td colspan="2" style="color: #d63031;">
+                        {{ \App\Support\Money::format($totalCost) }}
+                        @if($otherCurrencyCount > 0)
+                            <div style="font-size: 0.7rem; color: #64748b; font-weight: normal;">excludes {{ $otherCurrencyCount }} card(s) recorded in another currency</div>
+                        @endif
+                    </td>
                 </tr>
             </tbody>
         </table>
