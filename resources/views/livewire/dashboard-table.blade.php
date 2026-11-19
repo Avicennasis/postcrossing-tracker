@@ -48,17 +48,17 @@
         <div class="filter-group">
             <label>Sent Date</label>
             <div class="flex items-center gap-2" wire:ignore>
-                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: 'd/m/Y', dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('start_kirim', str) })" value="{{ $start_kirim }}" class="filter-control datepicker-active" placeholder="DD/MM/YYYY">
+                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }}, dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('start_kirim', str) })" value="{{ $start_kirim }}" class="filter-control datepicker-active" placeholder="{{ $dateFormatHint }}">
                 <span class="text-gray-400">-</span>
-                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: 'd/m/Y', dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('end_kirim', str) })" value="{{ $end_kirim }}" class="filter-control datepicker-active" placeholder="DD/MM/YYYY">
+                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }}, dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('end_kirim', str) })" value="{{ $end_kirim }}" class="filter-control datepicker-active" placeholder="{{ $dateFormatHint }}">
             </div>
         </div>
         <div class="filter-group">
             <label>Received Date</label>
             <div class="flex items-center gap-2" wire:ignore>
-                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: 'd/m/Y', dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('start_terima', str) })" value="{{ $start_terima }}" class="filter-control datepicker-active" placeholder="DD/MM/YYYY">
+                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }}, dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('start_terima', str) })" value="{{ $start_terima }}" class="filter-control datepicker-active" placeholder="{{ $dateFormatHint }}">
                 <span class="text-gray-400">-</span>
-                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: 'd/m/Y', dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('end_terima', str) })" value="{{ $end_terima }}" class="filter-control datepicker-active" placeholder="DD/MM/YYYY">
+                <input type="text" x-data x-init="flatpickr($el, { altInput: true, altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }}, dateFormat: 'Y-m-d', onChange: (d, str) => $wire.set('end_terima', str) })" value="{{ $end_terima }}" class="filter-control datepicker-active" placeholder="{{ $dateFormatHint }}">
             </div>
         </div>
         <div class="filter-group">
@@ -142,8 +142,8 @@
                                 <span class="font-bold text-gray-700">{{ $row->postcard_id ?: '-' }}</span>
                             @endif
                         </td>
-                        <td>{{ $row->tanggal_kirim ? \Carbon\Carbon::parse($row->tanggal_kirim)->format('d/m/Y') : '-' }}</td>
-                        <td>{{ ($row->tanggal_terima && $row->tanggal_terima != '0000-00-00') ? \Carbon\Carbon::parse($row->tanggal_terima)->format('d/m/Y') : '-' }}</td>
+                        <td>{{ $row->tanggal_kirim ? \Carbon\Carbon::parse($row->tanggal_kirim)->format($dateFormat) : '-' }}</td>
+                        <td>{{ ($row->tanggal_terima && $row->tanggal_terima != '0000-00-00') ? \Carbon\Carbon::parse($row->tanggal_terima)->format($dateFormat) : '-' }}</td>
                         <td>
                             <span class="badge">{{ $this->getDuration($row->tanggal_kirim, $row->tanggal_terima) }}</span>
                         </td>

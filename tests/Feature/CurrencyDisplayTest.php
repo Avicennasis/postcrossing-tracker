@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\DashboardTable;
 use App\Models\Postcard;
 use App\Models\User;
+use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -84,6 +85,26 @@ class CurrencyDisplayTest extends TestCase
             ->assertSee('$4.05')
             ->assertSee('IDR 15.000')
             ->assertSee('excludes 1 card(s) recorded in another currency');
+    }
+
+    public function test_dates_use_the_configured_format(): void
+    {
+        config(['app.date_format' => 'm/d/Y']);
+        (new AppServiceProvider($this->app))->boot();
+
+        $card = $this->card(['biaya_prangko' => 1.65, 'tanggal_kirim' => '2024-03-15', 'tanggal_terima' => '2024-04-02']);
+
+        $this->actingAs($this->user)
+            ->get(route('view', ['id' => $card->id]))
+            ->assertOk()
+            ->assertSee('03/15/2024')
+            ->assertSee('04/02/2024');
+
+        $this->actingAs($this->user)
+            ->get(route('postcard.register'))
+            ->assertOk()
+            ->assertSee('(MM/DD/YYYY)')
+            ->assertSee("altFormat: 'm\\/d\\/Y'", false);
     }
 
     public function test_currency_migration_backfills_existing_rows_as_idr(): void

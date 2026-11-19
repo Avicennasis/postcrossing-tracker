@@ -111,6 +111,9 @@ return [
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
+    // How dates are shown and typed in the UI (PHP letters d, m, Y), e.g. m/d/Y for the US.
+    'date_format' => env('APP_DATE_FORMAT', 'd/m/Y'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

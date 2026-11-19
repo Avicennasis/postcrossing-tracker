@@ -132,7 +132,7 @@
                             const fp = flatpickr($refs.input, {
                                 defaultDate: dateValue,
                                 altInput: true,
-                                altFormat: 'd/m/Y',
+                                altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }},
                                 dateFormat: 'Y-m-d',
                                 allowInput: true,
                                 onChange: function(selectedDates, dateStr, instance) {
@@ -159,7 +159,7 @@
                          ">
                         <label class="vintage-label">Sent Date</label>
                         <input x-ref="input" type="text" class="vintage-input" id="tgl_kirim">
-                        <small class="text-xs text-gray-400 block mt-1">(DD/MM/YYYY)</small>
+                        <small class="text-xs text-gray-400 block mt-1">({{ $dateFormatHint }})</small>
                         @error('tanggal_kirim') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div class="form-group" wire:ignore
@@ -168,7 +168,7 @@
                             const fp = flatpickr($refs.input, {
                                 defaultDate: dateValue,
                                 altInput: true,
-                                altFormat: 'd/m/Y',
+                                altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }},
                                 dateFormat: 'Y-m-d',
                                 allowInput: true,
                                 onChange: function(selectedDates, dateStr, instance) {
@@ -193,7 +193,7 @@
                          ">
                         <label class="vintage-label">Received Date</label>
                         <input x-ref="input" type="text" class="vintage-input" id="tgl_terima">
-                        <small class="text-xs text-gray-400 block mt-1">(DD/MM/YYYY)</small>
+                        <small class="text-xs text-gray-400 block mt-1">({{ $dateFormatHint }})</small>
                     </div>
 
                     @if($type == 'received')

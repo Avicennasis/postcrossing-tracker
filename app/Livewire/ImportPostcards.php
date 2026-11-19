@@ -57,22 +57,9 @@ class ImportPostcards extends Component
                 $type = strtolower(trim($data[0]));
                 $pc_id = trim($data[1] ?? '');
 
-                // Date conversion DD/MM/YYYY -> YYYY-MM-DD (explicit format to avoid day/month swap)
-                $tgl_k_raw = trim($data[2] ?? '');
-                $tgl_k = null;
-                if (! empty($tgl_k_raw)) {
-                    $parsed = \DateTime::createFromFormat('d/m/Y', $tgl_k_raw)
-                           ?: \DateTime::createFromFormat('Y-m-d', $tgl_k_raw);
-                    $tgl_k = $parsed ? $parsed->format('Y-m-d') : null;
-                }
-
-                $tgl_t_raw = trim($data[3] ?? '');
-                $tgl_t = null;
-                if (! empty($tgl_t_raw)) {
-                    $parsed = \DateTime::createFromFormat('d/m/Y', $tgl_t_raw)
-                           ?: \DateTime::createFromFormat('Y-m-d', $tgl_t_raw);
-                    $tgl_t = $parsed ? $parsed->format('Y-m-d') : null;
-                }
+                // Dates: DD/MM/YYYY or YYYY-MM-DD -> YYYY-MM-DD
+                $tgl_k = $this->parseDate($data[2] ?? '', $line);
+                $tgl_t = $this->parseDate($data[3] ?? '', $line);
 
                 $desc = trim($data[4] ?? '');
                 $nama = trim($data[5] ?? '');
@@ -161,6 +148,31 @@ class ImportPostcards extends Component
             fclose($handle);
             $this->file_csv = null;
         }
+    }
+
+    /**
+     * Parse a CSV date as DD/MM/YYYY or YYYY-MM-DD.
+     *
+     * createFromFormat() silently rolls invalid dates over (a US-style
+     * "03/15/2024" read as day 3 of month 15 becomes 2025-03-03), so any
+     * parse warning is treated as an error rather than stored.
+     */
+    protected function parseDate(string $raw, int $line): ?string
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return null;
+        }
+
+        foreach (['!d/m/Y', '!Y-m-d'] as $format) {
+            $parsed = \DateTime::createFromFormat($format, $raw);
+            $errors = \DateTime::getLastErrors();
+            if ($parsed && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+                return $parsed->format('Y-m-d');
+            }
+        }
+
+        throw new \RuntimeException("CSV row $line: invalid date \"$raw\" (use DD/MM/YYYY or YYYY-MM-DD).");
     }
 
     public function render()

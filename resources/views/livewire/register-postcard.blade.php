@@ -64,7 +64,7 @@
                           x-init="
                              const fp = flatpickr($refs.input, {
                                  altInput: true,
-                                 altFormat: 'd/m/Y',
+                                 altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }},
                                  dateFormat: 'Y-m-d',
                                  allowInput: true,
                                  onChange: function(selectedDates, dateStr, instance) {
@@ -91,7 +91,7 @@
                           ">
                          <label class="vintage-label">Registry Date</label>
                          <input x-ref="input" type="text" id="tanggalKirim" class="vintage-input w-full" required>
-                         <small class="text-xs text-gray-400 block mt-1">(DD/MM/YYYY)</small>
+                         <small class="text-xs text-gray-400 block mt-1">({{ $dateFormatHint }})</small>
                          @error('tanggal_kirim') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                      </div>
                 </div>
@@ -172,7 +172,7 @@
                             const fp = flatpickr($refs.input, {
                                 defaultDate: dateValue,
                                 altInput: true,
-                                altFormat: 'd/m/Y',
+                                altFormat: {{ \Illuminate\Support\Js::from($dateFormat) }},
                                 dateFormat: 'Y-m-d',
                                 allowInput: true,
                                 onChange: function(selectedDates, dateStr, instance) {
@@ -197,7 +197,7 @@
                          ">
                         <label class="vintage-label">Received Date</label>
                         <input x-ref="input" type="text" id="tanggalTerima" class="vintage-input w-full">
-                        <small class="text-xs text-gray-400 block mt-1">(DD/MM/YYYY)</small>
+                        <small class="text-xs text-gray-400 block mt-1">({{ $dateFormatHint }})</small>
                     </div>
                     <div>
                         <label class="vintage-label">Currency</label>

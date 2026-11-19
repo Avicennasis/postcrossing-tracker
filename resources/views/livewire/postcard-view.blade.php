@@ -188,11 +188,11 @@
             <div>
                 <div class="info-item">
                     <label>Sent Date</label>
-                    <span>{{ \Carbon\Carbon::parse($card->tanggal_kirim)->format('d/m/Y') }}</span>
+                    <span>{{ \Carbon\Carbon::parse($card->tanggal_kirim)->format($dateFormat) }}</span>
                 </div>
                 <div class="info-item">
                     <label>Received Date</label>
-                    <span>{{ (!empty($card->tanggal_terima) && $card->tanggal_terima != '0000-00-00') ? \Carbon\Carbon::parse($card->tanggal_terima)->format('d/m/Y') : 'Travelling / Not Yet Received' }}</span>
+                    <span>{{ (!empty($card->tanggal_terima) && $card->tanggal_terima != '0000-00-00') ? \Carbon\Carbon::parse($card->tanggal_terima)->format($dateFormat) : 'Travelling / Not Yet Received' }}</span>
                 </div>
                 <div class="info-item">
                     <label>Duration</label>

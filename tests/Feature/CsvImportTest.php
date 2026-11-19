@@ -102,6 +102,21 @@ CSV;
         Http::assertNothingSent();
     }
 
+    public function test_rejects_us_style_dates_instead_of_rolling_them_over(): void
+    {
+        Http::fake();
+
+        // Read as DD/MM/YYYY this is day 3 of month 15, which PHP would
+        // silently turn into 2025-03-03.
+        $csv = "header\nreceived;US-1;03/15/2024;;Card;Bob;1 Main St;United States;2.10;USD\n";
+
+        $this->import($csv)
+            ->assertSet('messageType', 'error')
+            ->assertSet('message', 'Import failed: CSV row 2: invalid date "03/15/2024" (use DD/MM/YYYY or YYYY-MM-DD).');
+
+        $this->assertSame(0, Postcard::count());
+    }
+
     public function test_aborts_the_import_instead_of_storing_a_one_to_one_rate_when_no_rate_is_available(): void
     {
         Http::fake(['*' => Http::response('', 500)]);
