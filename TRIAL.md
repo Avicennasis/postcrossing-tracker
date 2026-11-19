@@ -12,6 +12,10 @@ manual entry or CSV import.
   now `exchange_rate` with 10 decimals.
 - Timezone (`APP_TIMEZONE`), date format (`APP_DATE_FORMAT`) and the
   location shown to recipients (`OWNER_LOCATION`) are configurable.
+- Each sent card has its own "Sent From" place (home by default; pick a
+  recent place or add one while travelling). Distances, maps and totals use
+  it. The public arrival page only shows origins rounded to ~11 km. Upstream
+  printed the exact home coordinates into that page.
 - A base-schema migration was added. Upstream never committed its
   create-table migrations, so `php artisan migrate` failed on an empty
   database.
@@ -82,7 +86,7 @@ docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app php:8.4-cli \
 | `APP_LOCALE` | | `en`. Also sets the home page's default language. |
 | `OWNER_NAME`, `OWNER_EMAIL`, `OWNER_USERNAME`, `OWNER_CONTACT_EMAIL` | yes | `OWNER_EMAIL` receives arrival alerts. The others appear on public pages. |
 | `OWNER_LOCATION` | recommended | e.g. `"New York, USA"`. Shown to recipients on the arrival page and on the home page. |
-| `HOME_LAT`, `HOME_LNG` | recommended | Origin for distance stats. |
+| `HOME_LAT`, `HOME_LNG` | recommended | Home: the default "Sent From" place and the end point for received cards. Keep these only in your local `.env`. |
 | `GOOGLE_API_KEY` | for maps | Maps JavaScript API (maps) plus Places Text Search and Geocoding APIs (address → coordinates). Without it, maps don't render, coordinates are 0,0 and distances are 0. Everything else works. |
 | `AMAP_JS_KEY`, `AMAP_WEB_KEY` | optional | Only for visitors in China / Chinese addresses. |
 | `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` | for login | The Sign In button stays disabled until the reCAPTCHA v2 widget passes. For localhost, Google publishes test keys in the [reCAPTCHA FAQ](https://developers.google.com/recaptcha/docs/faq). |
@@ -106,6 +110,7 @@ Upload at `/import`. The file is **semicolon-separated**, and the first line is 
 | 9 | telepon | **sent rows only** (11 columns). Received rows omit it (10 columns). |
 | 9/10 | biaya_asal | amount, `1.65` or `1,65` (no thousands separators) |
 | 10/11 | mata_uang | ISO code. Blank = base currency. Any other currency is converted to the base currency at the rate for the sent date. |
+| 12-14 | origin_name; origin_lat; origin_lng | optional, sent rows only: where the card was posted from. Blank = home. |
 
 ```csv
 type;postcard_id;tgl_kirim;tgl_terima;deskripsi;nama;alamat;negara;telepon;biaya_asal;mata_uang
@@ -128,6 +133,10 @@ is the only slash format accepted, so `01/04/2024` means 1 April. Use
   non-empty and never verifies it with Google (`RECAPTCHA_SECRET_KEY` is
   unused), and login is not rate-limited. Put it behind the mesh/Authelia,
   or add throttling, before anything reachable.
+- **Origins:** the place name you pick for a card is shown to its
+  recipient. Coordinates on the public arrival page are rounded to one
+  decimal. "Use my current location" only works over HTTPS (or on
+  localhost).
 - **Some pages are public by design.** `/` (profile page), `/gallery`
   (your collection) and `/receive/{uid}` (recipients confirm arrival
   without logging in; this writes the arrival date and their message).
