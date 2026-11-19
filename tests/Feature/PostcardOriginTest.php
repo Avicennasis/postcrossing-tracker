@@ -45,7 +45,7 @@ class PostcardOriginTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.home_lat' => self::LONDON[0], 'app.home_lng' => self::LONDON[1], 'app.owner_location' => 'London, UK']);
+        config(['app.home_lat' => self::LONDON[0], 'app.home_lng' => self::LONDON[1], 'app.owner_location' => 'London, UK', 'currency.base' => 'USD']);
         $this->withoutVite();
         Http::preventStrayRequests();
 
