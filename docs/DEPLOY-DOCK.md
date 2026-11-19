@@ -70,7 +70,7 @@ standup leaked its `.env` this way; see `ServerOps/docker/deployed/invidious/REA
   `php artisan key:generate` produces, 32 random bytes for AES-256-CBC).
   Generate it here: compose refuses to build or run while it is empty.
 
-Put `APP_KEY` and `DB_PASSWORD` in the vault too (`/opt/simsyssecrets`).
+Put `APP_KEY` and both database passwords in your secret store too.
 **Losing `APP_KEY` makes every encrypted contact address, phone number and
 coordinate unreadable**, and the vzdump only helps if the key survives as
 well.
