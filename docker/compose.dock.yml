@@ -81,14 +81,14 @@ services:
         max-file: "4"
 
   db:
-    image: mariadb:11
+    image: mariadb:11@sha256:d36f18d65a0459510b8b0f643b226a6d299e3206486e2b64ff20754a6d291707
     container_name: postcrossing-tracker-db
     restart: unless-stopped
     environment:
       MARIADB_DATABASE: postcards
       MARIADB_USER: postcards
       MARIADB_PASSWORD: "${DB_PASSWORD:?set DB_PASSWORD}"
-      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+      MARIADB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD}"
     volumes:
       - db:/var/lib/mysql
       # Nightly logical dumps land here (see docs/DEPLOY-DOCK.md)
