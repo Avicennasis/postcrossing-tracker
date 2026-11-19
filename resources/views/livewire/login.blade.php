@@ -207,6 +207,7 @@
                                placeholder="" required>
                     </div>
 
+                    @if ($recaptchaEnabled)
                     <div class="flex justify-center mb-4">
                         <div wire:ignore>
                             <div class="g-recaptcha" 
@@ -216,8 +217,9 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
-                    <button type="submit" class="btn-login-custom" id="loginBtn" @if(!$recaptchaToken) disabled @endif wire:loading.attr="disabled">
+                    <button type="submit" class="btn-login-custom" id="loginBtn" @if($recaptchaEnabled && !$recaptchaToken) disabled @endif wire:loading.attr="disabled">
                         <i class="bi bi-box-arrow-in-right"></i> Sign In
                     </button>
                     
@@ -229,7 +231,9 @@
         </div>
     </div>
 
+    @if ($recaptchaEnabled)
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
     <script>
         function onRecaptchaSuccess(token) {
             const btn = document.getElementById('loginBtn');
