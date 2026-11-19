@@ -46,6 +46,9 @@ services:
       SESSION_DRIVER: file
       CACHE_STORE: file
       QUEUE_CONNECTION: sync
+      MAP_PROVIDER: "${MAP_PROVIDER:-leaflet}"
+      NOMINATIM_URL: "${NOMINATIM_URL:-https://nominatim.openstreetmap.org}"
+      NOMINATIM_USER_AGENT: "${NOMINATIM_USER_AGENT:-postcard-tracker/1.0 (self-hosted)}"
       GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
       AMAP_JS_KEY: "${AMAP_JS_KEY:-}"
       AMAP_WEB_KEY: "${AMAP_WEB_KEY:-}"
@@ -59,6 +62,9 @@ services:
       MAIL_ENCRYPTION: "${MAIL_ENCRYPTION:-tls}"
       MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-}"
       MAIL_FROM_NAME: "${MAIL_FROM_NAME:-Postcard Tracker}"
+      MAIL_PROVENANCE_FOOTER: "${MAIL_PROVENANCE_FOOTER:-false}"
+      MAIL_PROVENANCE_HOST: "${MAIL_PROVENANCE_HOST:-}"
+      MAIL_PROVENANCE_SOURCE: "${MAIL_PROVENANCE_SOURCE:-}"
     volumes:
       # Uploaded postcard/stamp photos (served via public/storage)
       - uploads:/var/www/html/storage/app/public

@@ -117,6 +117,13 @@ return [
     |
     */
 
+    // Optional 4-line provenance footer on automated mail (generator, host, source, schedule)
+    'provenance' => [
+        'enabled' => (bool) env('MAIL_PROVENANCE_FOOTER', false),
+        'host' => env('MAIL_PROVENANCE_HOST'),
+        'source' => env('MAIL_PROVENANCE_SOURCE'),
+    ],
+
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Postcard Tracker')),
