@@ -156,7 +156,7 @@
              <h3 style="margin-top:15px; color:#444; font-family:'Special Elite'; margin-bottom:15px; text-align: left; padding-left: 15px;">
                 Distribution Map <span style="font-size:0.7em; color: #94a3b8;">(🔵 SENT | 🟢 RECEIVED)</span>
             </h3>
-            <div id="dashboard-map"></div>
+            <div id="dashboard-map" wire:ignore></div>
         </div>
 
         <div class="stats-container">
@@ -268,7 +268,11 @@
     </div>
 
     <script src="{{ asset('vendor/chartjs/chart.js') }}"></script>
+    @if (config('maps.provider') === 'google')
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.google_api_key') }}&callback=initDashboardMap&loading=async" async defer></script>
+    @else
+    @include('livewire.partials.leaflet-assets')
+    @endif
 
     <script>
         const markersData = @json($mapMarkers);
@@ -354,6 +358,18 @@
                 dashboardMap.fitBounds(bounds);
             }
         }
+
+        @if (! (config('maps.provider') === 'google'))
+        // Leaflet + OpenStreetMap
+        document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('dashboard-map');
+            if (!el) return;
+            const map = PcMap.create(el, { zoom: 2, center: [20, 10] });
+            if (!markersData.length) return;
+            PcMap.spreadMarkers(map, markersData, m => PcMap.dot([m.lat, m.lng], m.color, 6, 1).bindPopup(m.content));
+            map.fitBounds(L.latLngBounds(markersData.map(m => [m.lat, m.lng])), { padding: [20, 20], maxZoom: 6 });
+        });
+        @endif
 
         document.addEventListener('livewire:initialized', () => {
             const chartData = @json($chartData);

@@ -200,7 +200,24 @@
         const targetLng = {{ $targetLng }};
     </script>
 
-    @if ($isChina)
+    @if (! (config('maps.provider') === 'google'))
+    @include('livewire.partials.leaflet-assets')
+    <script>
+        @if($postcard && !$alreadyConfirmed && !$justConfirmed)
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('map-confirm');
+            if (!el) return;
+            var from = [myLat, myLng], to = [targetLat, targetLng];
+            var map = PcMap.create(el, { zoom: 2, center: from, zoomControl: false });
+            PcMap.dot(from, '#ff4b4b', 6, 1).addTo(map);
+            if (!targetLat && !targetLng) return;
+            PcMap.dot(to, '#4f46e5', 6, 1).addTo(map);
+            L.polyline(PcMap.greatCircle(from, to), { color: '#4f46e5', weight: 2, opacity: 0.8, dashArray: '4 6' }).addTo(map);
+            map.fitBounds(L.latLngBounds([from, to]), { padding: [30, 30] });
+        });
+        @endif
+    </script>
+    @elseif ($isChina)
     <script type="text/javascript">
         window._AMapSecurityConfig = { securityJsCode: '{{ config('app.amap_web_key') }}' };
     </script>

@@ -381,7 +381,10 @@
 
 
     <!-- Conditional Map Script Loading -->
-    @if ($isChina)
+    @if (! (config('maps.provider') === 'google'))
+        @include('livewire.partials.leaflet-assets')
+    @endif
+    @if (config('maps.provider') === 'google' && $isChina)
         <script type="text/javascript">
             window._AMapSecurityConfig = { securityJsCode: '{{ config('app.amap_web_key') }}' };
         </script>
@@ -530,13 +533,29 @@
     }
 
     // Initialize map on page load
-    @if ($isChina)
+    @if (config('maps.provider') === 'google' && $isChina)
         window.onload = function() { initMap(); };
     @endif
 </script>
 
-@if (!$isChina)
+@if (config('maps.provider') === 'google' && !$isChina)
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.google_api_key') }}&libraries=marker&callback=initMap&loading=async" async defer></script>
+@endif
+@if (! (config('maps.provider') === 'google'))
+    <script>
+        // Leaflet + OpenStreetMap (assets are included inside the component root above)
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('map');
+            if (!el || rawMarkers.length === 0) return;
+            var map = PcMap.create(el, { zoom: 2, center: [20, 0], minZoom: 2, maxZoom: 10 });
+            PcMap.spreadMarkers(map, rawMarkers, function (m) {
+                return PcMap.dot([m.lat, m.lng], m.color, 6, 2)
+                    .bindTooltip(document.createTextNode(m.country || ''))
+                    .on('click', function () { scrollToItem(m.id); });
+            });
+            map.fitBounds(L.latLngBounds(rawMarkers.map(function (m) { return [m.lat, m.lng]; })), { padding: [50, 50], maxZoom: 6 });
+        });
+    </script>
 @endif
 
 </div>

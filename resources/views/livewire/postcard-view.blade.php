@@ -251,7 +251,11 @@
     <!-- SCRIPTS -->
     <script src="{{ asset('vendor/qrcode/qrcode.min.js') }}"></script>
     <script src="{{ asset('vendor/html-to-image/html-to-image.js') }}"></script>
+    @if (config('maps.provider') === 'google')
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('app.google_api_key') }}&libraries=marker&callback=initViewMap&loading=async" async defer></script>
+    @else
+    @include('livewire.partials.leaflet-assets')
+    @endif
 
     <script>
         function openLightbox(src) {
@@ -312,6 +316,22 @@
             bounds.extend(targetPos);
             map.fitBounds(bounds, 50);
         }
+
+        @if (! (config('maps.provider') === 'google'))
+        // Map using Leaflet + OpenStreetMap
+        document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('google-map-view');
+            if (!el) return;
+            const from = [{{ (float) $originLat }}, {{ (float) $originLng }}];
+            const to = [{{ (float) ($card->contact?->lat ?? 0) }}, {{ (float) ($card->contact?->lng ?? 0) }}];
+            const map = PcMap.create(el, { zoom: 3, center: from });
+            PcMap.dot(from, '#ff4b4b', 8, 2).bindTooltip(@js(($card->type == 'sent' ? 'Sent from: ' : 'Home: ').$originName)).addTo(map);
+            if (to[0] === 0 && to[1] === 0) return;
+            PcMap.dot(to, '#007bff', 8, 2).bindPopup('<b>Destination</b><br>' + @js(nl2br(e($card->contact?->alamat)))).addTo(map);
+            L.polyline(PcMap.greatCircle(from, to), { color: '#007bff', weight: 3, opacity: 0.8, dashArray: '6 6' }).addTo(map);
+            map.fitBounds(L.latLngBounds([from, to]), { padding: [50, 50] });
+        });
+        @endif
 
         // QR Code
         @if($card->type == 'sent')

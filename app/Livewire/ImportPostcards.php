@@ -46,6 +46,9 @@ class ImportPostcards extends Component
         $count = 0;
         $line = 1;
         $base = Money::base();
+        // Nominatim allows ~1 lookup/s: geocode within a time budget, leave the rest for later
+        $geoDeadline = microtime(true) + max(0, (int) config('maps.import_geocode_budget', 20));
+        $geoPending = 0;
 
         DB::beginTransaction();
         try {
@@ -97,7 +100,12 @@ class ImportPostcards extends Component
                 }
 
                 $biaya = Money::round($cost * $rate, $base);
-                $coords = $geoService->getCoordinates($almt, $neg);
+                if (microtime(true) < $geoDeadline) {
+                    $coords = $geoService->getCoordinates($almt, $neg);
+                } else {
+                    $coords = ['lat' => 0.0, 'lng' => 0.0];
+                    $geoPending++;
+                }
 
                 // Fetch Country ID (English name, Indonesian name, or ISO code)
                 $country = Country::findByName($neg);
@@ -143,6 +151,9 @@ class ImportPostcards extends Component
             }
             DB::commit();
             $this->message = "Successfully imported $count records!";
+            if ($geoPending > 0) {
+                $this->message .= " $geoPending address(es) still need map coordinates: run `php artisan postcards:geocode-missing` or use Refresh Location on the card.";
+            }
             $this->messageType = 'success';
         } catch (\Exception $e) {
             DB::rollBack();

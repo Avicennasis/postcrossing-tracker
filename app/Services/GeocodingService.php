@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Country;
 use Illuminate\Support\Facades\Http;
 
 class GeocodingService
@@ -34,13 +35,28 @@ class GeocodingService
         if ($isChina) {
             $coords = $this->getCoordinatesChina($alamat_clean);
             if ($coords['lat'] === 0.0 && $coords['lng'] === 0.0) {
-                return $this->getCoordinatesGoogle($alamat_clean, $negara);
+                return $this->getCoordinatesGlobal($alamat_clean, $negara);
             }
 
             return $coords;
         } else {
-            return $this->getCoordinatesGoogle($alamat_clean, $negara);
+            return $this->getCoordinatesGlobal($alamat_clean, $negara);
         }
+    }
+
+    /**
+     * Google when MAP_PROVIDER=google, otherwise Nominatim (OpenStreetMap).
+     */
+    protected function getCoordinatesGlobal($alamat, $negara)
+    {
+        if (config('maps.provider') === 'google') {
+            return $this->getCoordinatesGoogle($alamat, $negara);
+        }
+
+        // Nominatim understands English country names better than "Jerman" or "DE"
+        $country = Country::findByName($negara)?->display_name ?? $negara;
+
+        return app(NominatimGeocoder::class)->geocode((string) $alamat, (string) $country);
     }
 
     protected function getCoordinatesChina($alamat)
