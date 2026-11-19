@@ -1,0 +1,102 @@
+# Postcard tracker on a dockN LXC (house pattern: mesh-IP-only publish, secrets
+# only in /opt/postcrossing-tracker/.env on the dock). See docs/DEPLOY-DOCK.md.
+#
+# The ${VAR:?} forms make `docker compose` refuse to start when a value is
+# missing. An unset DOCK_BIND_IP would otherwise publish on 0.0.0.0.
+name: postcrossing-tracker
+
+services:
+  app:
+    image: postcrossing-tracker:local
+    build:
+      # Layout on the dock: /opt/postcrossing-tracker/{compose.yml (this file), .env, src/ (git checkout)}
+      context: ./src
+      dockerfile: docker/Dockerfile
+    container_name: postcrossing-tracker
+    restart: unless-stopped
+    ports:
+      - "${DOCK_BIND_IP:?set DOCK_BIND_IP to this dock's mesh IP}:${PCT_HTTP_PORT:?set PCT_HTTP_PORT}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    environment:
+      APP_NAME: "${APP_NAME:-Postcard Tracker}"
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: "${APP_KEY:?set APP_KEY (echo base64:$$(openssl rand -base64 32)); never change it}"
+      APP_URL: "${APP_URL:?set APP_URL to the public https URL}"
+      APP_TIMEZONE: "${APP_TIMEZONE:-UTC}"
+      APP_LOCALE: "${APP_LOCALE:-en}"
+      APP_DATE_FORMAT: "${APP_DATE_FORMAT:-d/m/Y}"
+      APP_BASE_CURRENCY: "${APP_BASE_CURRENCY:?set APP_BASE_CURRENCY}"
+      OWNER_NAME: "${OWNER_NAME:-}"
+      OWNER_USERNAME: "${OWNER_USERNAME:-}"
+      OWNER_LOCATION: "${OWNER_LOCATION:-}"
+      OWNER_EMAIL: "${OWNER_EMAIL:-}"
+      OWNER_CONTACT_EMAIL: "${OWNER_CONTACT_EMAIL:-}"
+      HOME_LAT: "${HOME_LAT:-0}"
+      HOME_LNG: "${HOME_LNG:-0}"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: postcards
+      DB_USERNAME: postcards
+      DB_PASSWORD: "${DB_PASSWORD:?set DB_PASSWORD}"
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
+      AMAP_JS_KEY: "${AMAP_JS_KEY:-}"
+      AMAP_WEB_KEY: "${AMAP_WEB_KEY:-}"
+      RECAPTCHA_SITE_KEY: "${RECAPTCHA_SITE_KEY:-}"
+      RECAPTCHA_SECRET_KEY: "${RECAPTCHA_SECRET_KEY:-}"
+      MAIL_MAILER: "${MAIL_MAILER:-log}"
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION:-tls}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-}"
+      MAIL_FROM_NAME: "${MAIL_FROM_NAME:-Postcard Tracker}"
+    volumes:
+      # Uploaded postcard/stamp photos (served via public/storage)
+      - uploads:/var/www/html/storage/app/public
+    healthcheck:
+      # Laravel's /up: the app boots (bootstrap/app.php already trusts X-Forwarded-* from any proxy)
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "4"
+
+  db:
+    image: mariadb:11
+    container_name: postcrossing-tracker-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: postcards
+      MARIADB_USER: postcards
+      MARIADB_PASSWORD: "${DB_PASSWORD:?set DB_PASSWORD}"
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - db:/var/lib/mysql
+      # Nightly logical dumps land here (see docs/DEPLOY-DOCK.md)
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "4"
+
+volumes:
+  db:
+  uploads:

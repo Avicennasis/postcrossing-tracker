@@ -128,6 +128,10 @@ is the only slash format accepted, so `01/04/2024` means 1 April. Use
 
 ## Before exposing it on the mesh
 
+A production compose file (app + MariaDB) and a dockN runbook are in
+`docker/compose.dock.yml` and `docs/DEPLOY-DOCK.md`.
+
+
 - **Login protection is weak.** It is single-user Laravel auth with no
   sign-up page. The server only checks that a reCAPTCHA token is
   non-empty and never verifies it with Google (`RECAPTCHA_SECRET_KEY` is
