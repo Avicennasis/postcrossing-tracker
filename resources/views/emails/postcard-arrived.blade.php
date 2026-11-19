@@ -192,7 +192,7 @@
 
             <div class="footer">
                 Sent automatically by <strong>Postcard Tracker</strong><br>
-                &copy; {{ date('Y') }} mlintangmz. Every postcard tells a story.
+                &copy; {{ date('Y') }} {{ config('app.owner_name') }}. Every postcard tells a story.
             </div>
         </div>
     </div>
