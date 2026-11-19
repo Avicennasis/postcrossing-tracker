@@ -30,6 +30,9 @@ return [
     'owner_username' => env('OWNER_USERNAME', 'postcrossing'),
     'owner_contact_email' => env('OWNER_CONTACT_EMAIL', env('OWNER_EMAIL', 'owner@example.com')),
 
+    // Where your postcards are sent from, shown to recipients (e.g. "Portland, Oregon, USA").
+    'owner_location' => env('OWNER_LOCATION'),
+
     /*
     |--------------------------------------------------------------------------
     | Third-Party API Keys
@@ -106,7 +109,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

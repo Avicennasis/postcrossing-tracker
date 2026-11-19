@@ -121,7 +121,7 @@ class ReceiveConfirm extends Component
             $fromAddress = config('mail.from.address', 'noreply@postcrossing.mlintangmz.my.id');
             $fromName = config('mail.from.name', 'Postcard Tracker');
 
-            $subject = '📬 Postcard Arrived! ['.($this->postcard->country?->nama_indonesia ?? 'Unknown').']';
+            $subject = '📬 Postcard Arrived! ['.($this->postcard->country?->display_name ?? 'Unknown').']';
             $senderMessage = $this->message;
 
             Mail::send('emails.postcard-arrived', [

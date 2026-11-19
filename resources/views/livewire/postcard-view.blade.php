@@ -274,7 +274,7 @@
                 position: myPos,
                 map: map,
                 icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: '#ff4b4b', fillOpacity: 0.8, scale: 8, strokeColor: 'white', strokeWeight: 2 },
-                title: 'My Location (Yogyakarta)'
+                title: @js(config('app.owner_location') ? 'My Location ('.config('app.owner_location').')' : 'My Location')
             });
 
             const targetMarker = new google.maps.Marker({

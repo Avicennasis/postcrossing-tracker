@@ -159,7 +159,7 @@
                 
                 <p class="intro">
                     Hello, <strong>{{ $ownerName }}</strong>!<br>
-                    Your postcard sent to <strong>{{ $postcard->contact?->nama_kontak ?? 'your recipient' }}</strong> in <strong>{{ $postcard->country?->nama_indonesia ?? 'their country' }}</strong> has just been marked as <strong>Received</strong>.
+                    Your postcard sent to <strong>{{ $postcard->contact?->nama_kontak ?? 'your recipient' }}</strong> in <strong>{{ $postcard->country?->display_name ?? 'their country' }}</strong> has just been marked as <strong>Received</strong>.
                 </p>
 
                 <div class="postcard-box">
