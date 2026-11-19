@@ -60,10 +60,13 @@ docker exec -d -u "$(id -u):$(id -g)" -e HOME=/tmp pct-app php artisan serve --h
 docker rm -f pct-app pct-db && docker network rm pct-net
 ```
 
-Run the tests (SQLite in memory, no database container needed):
+Run the tests (SQLite in memory, no database container needed). Like CI,
+this creates `.env` from `.env.example` if it is missing, because without
+one `artisan test` prints a dotenv warning for every test:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app php:8.4-cli php artisan test
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app php:8.4-cli \
+  sh -c 'test -f .env || cp .env.example .env; php artisan test'
 ```
 
 ## Environment variables
