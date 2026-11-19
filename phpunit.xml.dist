@@ -19,8 +19,6 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <!-- Test-only key: Contact PII is encrypted and sessions need a key; CI copies .env.example, which has none. -->
-        <env name="APP_KEY" value="base64:rLCCtM+DYs+4VNRJIzsXnoFM3zH8r9G2KfpU6h1mat8="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
